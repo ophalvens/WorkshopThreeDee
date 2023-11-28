@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odisee - Programming with Three.js</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<!-- This canvas element will contain our 3D world-->
+<canvas id="world"></canvas>
+<div id="instructions">Use the Arrow keys to move,<br>spacebar to reset</div>
+
+<script type="module">
+// STEP 0 - Import needed libraries
+// Three.js is the library that enables us to do the 3D stuff
+import * as THREE from 'three';
+// OrbitControls is an addon on Three.js that makes it super-easy to rotate our view
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// STEP 1 - Create variables and constants
+// We will use these variables along the way.
+// canvas will link to the html element with the id "world"
+const canvas = document.querySelector("#world");
+let camera,
+    controls,
+    hero,
+    mainLight,
+    moveX = 0,
+    moveZ = 0,
+    planeSize = 50, // size of the 'groundplane'
+    renderer,
+    scene;
+
+
+/**
+ * Sets up the 3D world
+ */     
+function initialize3DWorld() {
+  // STEP 2 - Setup a Scene with Camera and light
+  
+  function createScene() {
+    // 2.1 Create a scene
+    // A scene is analogous to a scene in a theatre, complete
+    // with actors and props, lighting and viewpoints (Camera)
+    scene = new THREE.Scene();
+  }
+
+  /**
+   * Sets up the Renderer
+   */
+  function createRenderer() {
+    // Link the 3D world to the canvas element in the HTML document
+    renderer = new THREE.WebGLRenderer({ canvas : canvas, antialias: true });
+    // Make the renderer (canvas) as big as the visible part of your browser
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    // Set the pixelratio : set the ratio (=~ size) to that of the device that the user is using.
+    renderer.setPixelRatio( window.devicePixelRatio );
+    // Enable shadows
+    renderer.shadowMap.enabled = true;
+  }
+  
+  /**
+   * Creates the Camera object
+   */
+  function createCamera() {
+    // When we work in a 3D world, we need at least one "view" / "lense" / Camera to look through.
+    // We set this Camera up with 
+    // x how wide the view will be (75° in this case) - higher means you'll see more of the world around you
+    // x the aspect - we will match the current width & height of the browser
+    // x how close items may be to the camera to be seen (0.1m in this case) - items closer by won't be shown
+    // x how far items may be for the camera to be shown (1000m in this case) - items further away won't be shown
+    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+    // Put the camera somewhere in our 3D world
+    camera.position.x = 0; // right in the middle of 'left' and 'right'
+    camera.position.y = 10; // 10m up
+    camera.position.z = 5; // 5m 'back'
+    camera.updateProjectionMatrix(); // apply the above changes
+  }
+
+  /**
+   * Creates a plane or 'Ground'
+   */ 
+  function createPlane() {
+
+    // load a texture to wrap around the plane
+    const loader = new THREE.TextureLoader();
+    const planetexture = loader.load('https://stevenop.be/workshop/img/odisee-iconx256.png');
+      planetexture.wrapS = THREE.RepeatWrapping;
+      planetexture.wrapT = THREE.RepeatWrapping;
+      planetexture.magFilter = THREE.NearestFilter;
+      const repeatsPlane = planeSize / 2; // How many times do we want the texture to repeat on the plane?
+      planetexture.repeat.set(repeatsPlane, repeatsPlane);
+    
+    const planeMat = new THREE.MeshPhongMaterial({
+      map: planetexture,
+      side: THREE.DoubleSide,// this material will be visible from both the front and the backside
+    });
+
+    // Create the geometry, or 'form' of our ground (or 'plane') :
+    //  a square with length and width equal to planeSize (50m)
+    const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
+
+    // Create the mesh, or 'tangible object' of our ground (or 'plane')
+    const planeMesh = new THREE.Mesh(planeGeo, planeMat);
+
+    // rotate the plane so that it is 'horizontal' to the view from our camera
+    planeMesh.rotation.x = Math.PI * -.5;
+    planeMesh.position.y = -0.75;
+    planeMesh.receiveShadow = true; // have this mesh receive/display shadows
+
+    // Add the mesh to the scene
+    scene.add(planeMesh);
+  }
+
+  /**
+   * Adds a light
+   */ 
+  function createLight() {
+    // no light = nothing to see!
+    const color = 0xFFFFFF; // a pure white light
+    const intensity = 500; // 500 intensity, increase if you want more light
+    
+    // create the light itself
+    mainLight = new THREE.SpotLight(color, intensity, 0, 2, 0.01);
+    // this light casts shadows
+    mainLight.castShadow = true;
+    scene.add(mainLight); // add it to the scene
+    scene.add(mainLight.target); // add the lights target to the scene (where does it point to?)
+    mainLight.position.set(0, 10, 5); // x: 0 (middle), y: 'up' 10, z: 'towards the camera' 5
+    mainLight.target = hero; // shine towards the hero - hero must exist
+    mainLight.castShadow = true; // this light casts shadows
+    mainLight.penumbra = 1; // how 'sharp' the border of the lightcone is. 0 = hard, 1 = soft
+    mainLight.shadow.mapSize.width = 512; // increase for better shadows, costs more memory
+    mainLight.shadow.mapSize.height = 512;// increase for better shadows, costs more memoryd
+  }
+
+  /**
+   * Adds OrbitControls - manipulates the camera
+   */ 
+  function createOrbitControls() {
+    // create the OrbitControls for the camera and the canvas object
+    controls = new OrbitControls( camera, canvas );
+    // restrict how far the view can be changed towards the poles
+    // TODO: experiment with commenting the next 2 lines
+    controls.minPolarAngle = 0;
+    controls.maxPolarAngle =  Math.PI * 0.35;
+    //  controls.enablePan =  false; // enable this line to disable panning the view
+    //  controls.enableZoom =  false;// enable this line to disable zooming the view
+    controls.update();
+
+  }
+
+  /**
+   * Add the hero to the world - a small Sphere in this case
+   */ 
+  function createHero(){
+    // create a Sphere geometry with
+    // * a radius of 1m
+    // * 20 width segments -> more segments = rounder
+    // * 20 height segments -> more segments = rounder
+    // TODO: experiment with more/less segments and the size of the sphere
+    const geometry = new THREE.SphereGeometry( 1, 20, 20 );
+
+    // create the 'hero'
+    hero = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ side: THREE.FrontSide, flatShading:false, shininess:150, emissive:'#000', color:'#0D6499' }) );
+
+    // let the hero have a shadow
+    hero.castShadow = true;
+
+    // add hero to the scene
+    scene.add(hero);
+    hero.position.y = 0.5;
+    console.log(hero);
+  }
+
+  // create the scene
+  createScene();
+  // create the renderer
+  createRenderer();
+  // create the camera
+  createCamera();
+  // TODO: create the 'ground'
+  // TODO: create a hero
+  // TODO: add a light
+  // TODO: add orbitControls so we can drag the scene  
+}
+
+/**
+   * Creates an eventListener to listen to keydown events
+   */ 
+  function createListeners() {
+    // To react to the user entering a direction key, we
+    // have to 'listen' for it.
+
+    document.addEventListener("keydown", (event) => {
+      // we 'listen' for an event of the type "keypress"
+      // which will happen when the user taps a key
+
+      console.log(event.key); // just to show what key has been pressed
+      
+      // TODO: implement what happens when keys are pressed
+
+      if(event.key == "ArrowLeft") {
+        // TODO: move to the left, or towards negative (infinity) on the X-axis
+        return; // we stop executing in this listener, we know enough
+      }
+      if(event.key == "ArrowRight") {
+        // TODO: move to the right, or towards positive (infinity) on the X-axis
+        return; // we stop executing in this listener, we know enough
+      }
+      if(event.key == "ArrowUp") {
+        // TODO: move to the 'top' of the area, or towards negative (inifinity) on the Z-axis
+        return; // we stop executing in this listener, we know enough
+      }
+      if(event.key == "ArrowDown") {
+        // TODO: move to the 'bottom' of the area, or towards positive (inifinity) on the Z-axis
+        return; // we stop executing in this listener, we know enough
+      }
+      
+      // TODO: the pressed key was not one of the directional keys, we reset the move modifiers 
+      // TODO: reset the y position incase the hero fell of the board
+      
+      return;
+    });
+
+  }
+
+
+
+// STEP 2 - initialise the 3D world
+//  -> Setup a Scene, Camera, light, an 'actor' and some more
+initialize3DWorld();
+
+// TODO: create listeners to 'listen' for keypresses
+
+
+// STEP 3 - the animation-loop
+function animate() {
+  // TODO:render the scene from the viewpoint of our defined camera
+  // the renderer renders a view from a scene through a camara
+  renderer.render(scene, camera);
+
+  /* ---- Start your code here ---- */
+  // TODO: implement the logic animation of the hero
+  
+  /* ---- End your code her ---- */
+
+
+  // call the animation function again (so that it repeats / loops)
+  requestAnimationFrame( animate );
+}
+
+// STEP 3.1 - call the animation-loop for the first time
+//  -> this starts the animation
+requestAnimationFrame( animate );
+</script>
+</body>
+</html>
