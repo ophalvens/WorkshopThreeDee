@@ -216,18 +216,22 @@ function createListeners() {
 
     if(event.key == "ArrowLeft") {
       // TODO: move to the left, or towards negative (infinity) on the X-axis
+      moveX = -1;
       return; // we stop executing in this listener, we know enough
     }
     if(event.key == "ArrowRight") {
       // TODO: move to the right, or towards positive (infinity) on the X-axis
+      moveX = 1;
       return; // we stop executing in this listener, we know enough
     }
     if(event.key == "ArrowUp") {
       // TODO: move to the 'top' of the area, or towards negative (inifinity) on the Z-axis
+      moveZ = -1;
       return; // we stop executing in this listener, we know enough
     }
     if(event.key == "ArrowDown") {
       // TODO: move to the 'bottom' of the area, or towards positive (inifinity) on the Z-axis
+      moveZ = 1;
       return; // we stop executing in this listener, we know enough
     }
     
@@ -244,7 +248,8 @@ function createListeners() {
 //  -> Setup a Scene, Camera, light, an 'actor' and some more
 initialize3DWorld();
 
-// TODO: create listeners to 'listen' for keypresses
+// create listeners to 'listen' for keypresses
+createListeners();
 
 
 // STEP 3 - the animation-loop
@@ -255,6 +260,8 @@ function animate() {
 
   /* ---- Start your code here ---- */
   // TODO: implement the logic animation of the hero
+  hero.position.x = hero.position.x + moveX * 0.1;
+  hero.position.z = hero.position.z + moveZ * 0.1;
   
   /* ---- End your code her ---- */
 
