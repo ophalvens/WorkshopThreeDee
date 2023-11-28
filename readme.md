@@ -20,5 +20,5 @@ A plane, a Light and a Ball that can be steered with the arrow keys
 * Extract the zip file on the computer and remember where!
 * Go to https://vscode.dev, choose 'Open Folder' and select the folder where you extracted the zip-file
 * Test the project by opening the file ```index.html``` in your browser
-* Refresh the page each time you changed your code and want to see the changes
+* Refresh the page each time you change your code and want to see the changes
 * Tip: open the browser DEV-tools (```F12```)

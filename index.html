@@ -196,44 +196,43 @@ function initialize3DWorld() {
 }
 
 /**
-   * Creates an eventListener to listen to keydown events
-   */ 
-  function createListeners() {
-    // To react to the user entering a direction key, we
-    // have to 'listen' for it.
+ * Creates an eventListener to listen to keydown events
+ */ 
+function createListeners() {
+  // To react to the user entering a direction key, we
+  // have to 'listen' for it.
 
-    document.addEventListener("keydown", (event) => {
-      // we 'listen' for an event of the type "keypress"
-      // which will happen when the user taps a key
+  document.addEventListener("keydown", (event) => {
+    // we 'listen' for an event of the type "keypress"
+    // which will happen when the user taps a key
 
-      console.log(event.key); // just to show what key has been pressed
-      
-      // TODO: implement what happens when keys are pressed
+    console.log(event.key); // just to show what key has been pressed
+    
+    // TODO: implement what happens when keys are pressed
 
-      if(event.key == "ArrowLeft") {
-        // TODO: move to the left, or towards negative (infinity) on the X-axis
-        return; // we stop executing in this listener, we know enough
-      }
-      if(event.key == "ArrowRight") {
-        // TODO: move to the right, or towards positive (infinity) on the X-axis
-        return; // we stop executing in this listener, we know enough
-      }
-      if(event.key == "ArrowUp") {
-        // TODO: move to the 'top' of the area, or towards negative (inifinity) on the Z-axis
-        return; // we stop executing in this listener, we know enough
-      }
-      if(event.key == "ArrowDown") {
-        // TODO: move to the 'bottom' of the area, or towards positive (inifinity) on the Z-axis
-        return; // we stop executing in this listener, we know enough
-      }
-      
-      // TODO: the pressed key was not one of the directional keys, we reset the move modifiers 
-      // TODO: reset the y position incase the hero fell of the board
-      
-      return;
-    });
-
-  }
+    if(event.key == "ArrowLeft") {
+      // TODO: move to the left, or towards negative (infinity) on the X-axis
+      return; // we stop executing in this listener, we know enough
+    }
+    if(event.key == "ArrowRight") {
+      // TODO: move to the right, or towards positive (infinity) on the X-axis
+      return; // we stop executing in this listener, we know enough
+    }
+    if(event.key == "ArrowUp") {
+      // TODO: move to the 'top' of the area, or towards negative (inifinity) on the Z-axis
+      return; // we stop executing in this listener, we know enough
+    }
+    if(event.key == "ArrowDown") {
+      // TODO: move to the 'bottom' of the area, or towards positive (inifinity) on the Z-axis
+      return; // we stop executing in this listener, we know enough
+    }
+    
+    // TODO: the pressed key was not one of the directional keys, we reset the move modifiers 
+    // TODO: reset the y position incase the hero fell of the board
+    
+    return;
+  });
+}
 
 
 
