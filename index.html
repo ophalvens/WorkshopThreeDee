@@ -228,18 +228,42 @@ function createListeners() {
       return; // we stop executing in this listener, we know enough
     }
     if(event.key == "ArrowRight") {
-      // TODO: move to the right, or towards positive (infinity) on the X-axis
-      moveX = 1;
+      // move to the right, or towards positive (infinity) on the X-axis
+      if(moveX == 1) {
+        if(moveZ !== 0) { 
+          moveZ = 0; // stop moving on the Z-axis
+        } else {
+          moveX = 0; // stop moving on the X-axis
+        }    
+      } else {
+        moveX = 1; // we start moving in this direction
+      }
       return; // we stop executing in this listener, we know enough
     }
     if(event.key == "ArrowUp") {
-      // TODO: move to the 'top' of the area, or towards negative (inifinity) on the Z-axis
-      moveZ = -1;
+      // move to the 'top' of the area, or towards negative (inifinity) on the Z-axis
+      if(moveZ == -1) {
+        if(moveX !== 0) { 
+          moveX = 0; // stop moving on the Z-axis
+        } else {
+          moveZ = 0; // stop moving on the X-axis
+        } 
+      } else {
+        moveZ = -1; // we start moving in this direction
+      }
       return; // we stop executing in this listener, we know enough
     }
     if(event.key == "ArrowDown") {
-      // TODO: move to the 'bottom' of the area, or towards positive (inifinity) on the Z-axis
-      moveZ = 1;
+      // move to the 'bottom' of the area, or towards positive (inifinity) on the Z-axis
+      if(moveZ == 1) {
+        if(moveX !== 0) { 
+          moveX = 0; // stop moving on the Z-axis
+        } else {
+          moveZ = 0; // stop moving on the X-axis
+        } 
+      } else {
+        moveZ = 1; // we start moving in this direction
+      }
       return; // we stop executing in this listener, we know enough
     }
     
