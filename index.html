@@ -215,8 +215,16 @@ function createListeners() {
     // TODO: implement what happens when keys are pressed
 
     if(event.key == "ArrowLeft") {
-      // TODO: move to the left, or towards negative (infinity) on the X-axis
-      moveX = -1;
+      // move to the left, or towards negative (infinity) on the X-axis
+      if(moveX == -1) { 
+        if(moveZ !== 0) { 
+          moveZ = 0; // stop moving on the Z-axis
+        } else {
+          moveX = 0; // stop moving on the X-axis
+        }         
+      } else {
+        moveX = -1; // we start moving in this direction
+      }
       return; // we stop executing in this listener, we know enough
     }
     if(event.key == "ArrowRight") {
@@ -236,6 +244,8 @@ function createListeners() {
     }
     
     // TODO: the pressed key was not one of the directional keys, we reset the move modifiers 
+    moveX = 0;
+    moveZ = 0;
     // TODO: reset the y position incase the hero fell of the board
     
     return;
