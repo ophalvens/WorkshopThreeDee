@@ -293,9 +293,17 @@ function animate() {
   renderer.render(scene, camera);
 
   /* ---- Start your code here ---- */
-  // TODO: implement the logic animation of the hero
+  // animate the hero
   hero.position.x = hero.position.x + moveX * 0.1;
   hero.position.z = hero.position.z + moveZ * 0.1;
+
+  if(hero.position.x < planeSize/-2 || 
+    hero.position.x > planeSize/2 ||
+    hero.position.z > planeSize/2 ||
+    hero.position.z < planeSize/-2) {
+      // fall of the board!
+      hero.position.y = hero.position.y - 0.2;
+  }
   
   /* ---- End your code her ---- */
 
