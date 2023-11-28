@@ -12,12 +12,13 @@ Still, I hope you'll enjoy this Workshop!
 
 ## The Results
 ![A plane, a Light and a Ball that can be steered with the arrow keys](img/screenshot1.png)
+
 A plane, a Light and a Ball that can be steered with the arrow keys
 
 ## Getting started
 * Download the source code as a zip file
 * Extract the zip file on the computer and remember where!
-* Surf to https://vscode.dev, choose 'Open Folder' and select the folder where you extracted the zip-file
+* Go to https://vscode.dev, choose 'Open Folder' and select the folder where you extracted the zip-file
 * Test the project by opening the file ```index.html``` in your browser
 * Refresh the page each time you changed your code and want to see the changes
 * Tip: open the browser DEV-tools (```F12```)
