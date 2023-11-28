@@ -189,10 +189,14 @@ function initialize3DWorld() {
   createRenderer();
   // create the camera
   createCamera();
-  // TODO: create the 'ground'
-  // TODO: create a hero
-  // TODO: add a light
-  // TODO: add orbitControls so we can drag the scene  
+  // create the 'ground'
+  createPlane();
+  // create a hero
+  createHero();
+  // add a light
+  createLight();
+  // add orbitControls so we can drag the scene
+  createOrbitControls();  
 }
 
 /**
